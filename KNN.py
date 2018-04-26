@@ -4,7 +4,8 @@ import numpy as np
 import math
 from sklearn import preprocessing
 import operator
-import statistics
+from collections import Counter
+#import statistics
 
 def norm_ary(file):
     with open(file) as file1 :
@@ -39,8 +40,8 @@ def nearest_k(train_set, new_point, k):
     nearest = []
     for r in range(k):
         nearest.append(neighbors[r][0][0])
-    #print(nearest)
-    return (statistics.mode(nearest))
+    return(Counter(nearest).most_common(1)[0][0])
+    #return (statistics.mode(nearest))
 
 
 test = "knn_test.csv"
