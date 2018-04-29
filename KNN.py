@@ -5,11 +5,15 @@ import math
 from sklearn import preprocessing
 import operator
 from collections import Counter
+<<<<<<< HEAD
 import pylab as plt
 
 
 def plots(stuff):
     stuff
+=======
+#import statistics
+>>>>>>> origin/master
 
 def norm_ary(file):
     with open(file) as file1 :
@@ -60,6 +64,7 @@ def nearest_k(train_set, new_point, k, i = None):
         #print(nearest)
         return(Counter(nearest).most_common(1)[0][0])
 
+<<<<<<< HEAD
 def accuracy(training, testing, k, i = None):
     testing_accuracy = 0
     #accuracy_list = []
@@ -75,6 +80,19 @@ def accuracy(training, testing, k, i = None):
                 #print("correct")
                 testing_accuracy += 1
         return testing_accuracy
+=======
+    for t in train_set:
+        delta_x = dist(t, new_point)
+        neighbors.append((t, delta_x))
+        #print(neighbors)
+    neighbors.sort(key = operator.itemgetter(1))
+    nearest = []
+    for r in range(k):
+        nearest.append(neighbors[r][0][0])
+    return(Counter(nearest).most_common(1)[0][0])
+    #return (statistics.mode(nearest))
+
+>>>>>>> origin/master
 
 test = "knn_test.csv"
 train = "knn_train.csv"
