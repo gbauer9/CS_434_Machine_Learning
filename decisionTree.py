@@ -1,4 +1,4 @@
-# https://machinelearningmastery.com/implement-decision-tree-algorithm-scratch-python/
+# Much of the code for building the tree came from here, modified to use entropy instead of Gini index: https://machinelearningmastery.com/implement-decision-tree-algorithm-scratch-python/
 import numpy as np
 import math
 
