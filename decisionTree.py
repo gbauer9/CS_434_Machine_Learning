@@ -44,9 +44,9 @@ def find_best_split(dataset):
 	for index in range(1, len(dataset[0])):
 		for row in dataset:
 			groups = try_split(index, row[index], dataset)
-			ent = calc_uncertainty(groups)
-			if ent < b_score:
-				b_index, b_value, b_score, b_groups = index, row[index], ent, groups
+			uncertainty = calc_uncertainty(groups)
+			if uncertainty < b_score:
+				b_index, b_value, b_score, b_groups = index, row[index], uncertainty, groups
 	return {'index':b_index, 'value':b_value, 'groups':b_groups}
  
 # Create a terminal node value
