@@ -25,7 +25,7 @@ batch_size = 32
 kwargs = {'num_workers': 1, 'pin_memory': True} if cuda else {}
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.CIFAR10('../batches', train=True, download=True,
+    datasets.CIFAR10('./batches', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.ToTensor(),
 			transforms.Normalize((0.5, 0.5, 0.5), (0.5,0.5,0.5))
@@ -33,15 +33,16 @@ train_loader = torch.utils.data.DataLoader(
     batch_size=batch_size, shuffle=True, **kwargs)
 
 validation_loader = torch.utils.data.DataLoader(
-    datasets.CIFAR10('../batches', train=False, transform=transforms.Compose([
+    datasets.CIFAR10('./batches', train=False, transform=transforms.Compose([
                        transforms.ToTensor(),
  			transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5))
                    ])),
     batch_size=batch_size, shuffle=False, **kwargs)
+
 for (X_train, y_train) in train_loader:
-        print('X_train:', X_train.size(), 'type:', X_train.type())
-        print('y_train:', y_train.size(), 'type:', y_train.type())
-    	break
+    print('X_train:', X_train.size(), 'type:', X_train.type())
+    print('y_train:', y_train.size(), 'type:', y_train.type())
+    break
 
 pltsize=1
 plt.figure(figsize=(10*pltsize, pltsize))
@@ -68,7 +69,7 @@ class Net(nn.Module):
         x = self.fc1_drop(x)
      #   x = F.relu(self.fc2(x))
      #   x = self.fc2_drop(x)
-	return F.log_softmax(self.fc2(x))
+        return F.log_softmax(self.fc2(x))
 
 model = Net()
 if cuda:
@@ -92,6 +93,7 @@ def train(epoch, log_interval=100):
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.data[0]))
+
 def validate(loss_vector, accuracy_vector):
     model.eval()
     val_loss, correct = 0, 0
@@ -126,8 +128,8 @@ plt.title('validation loss')
 
 plt.figure(figsize=(5,3))
 plt.plot(np.arange(1,epochs+1), accv)
-plt.title('validation accuracy');
+plt.title('validation accuracy')
 
-plt.savefig("output.pdf");
+plt.savefig("output.pdf")
 
 
