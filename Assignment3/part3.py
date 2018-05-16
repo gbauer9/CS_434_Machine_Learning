@@ -41,7 +41,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.fc1 = nn.Linear(32*32*3, 100)
-        self.fc1_drop = nn.Dropout(0.2)
+        self.fc1_drop = nn.Dropout(0.1)
         self.fc2 = nn.Linear(100, 10)
 
     def forward(self, x):
@@ -59,8 +59,8 @@ def main():
     epochs = 5
 
     #learning_rate = .1#float(sys.argv[1])
-    moment = .4
-    opt = optim.SGD(model.parameters(), lr=.1, momentum=moment)
+    moment = .1
+    opt = optim.SGD(model.parameters(), lr=.1, momentum=moment, weight_decay=.1)
 
     lossv, accv = [], []
     for epoch in range(1, epochs + 1):
@@ -69,12 +69,12 @@ def main():
     plt.figure(figsize=(5,3))
     plt.plot(np.arange(1,epochs+1), lossv)
     plt.title('validation loss')
-    plt.savefig("Momentloss" + str(moment) + ".png")
+    plt.savefig("decayloss" + str(0.1) + ".png")
 
     plt.figure(figsize=(5,3))
     plt.plot(np.arange(1,epochs+1), accv)
     plt.title('validation accuracy')
-    plt.savefig("Moment" + str(moment) + ".png")
+    plt.savefig("decay" + str(0.1) + ".png")
 
 
 def train(epoch, optimizer, log_interval=100):
