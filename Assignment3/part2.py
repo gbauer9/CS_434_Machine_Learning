@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 cuda = torch.cuda.is_available()
 print('Using PyTorch version:', torch.__version__, 'CUDA:', cuda)
 
-batch_size = 50
+batch_size = 10000
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if cuda else {}
 
