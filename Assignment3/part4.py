@@ -73,12 +73,12 @@ def main():
     plt.figure(figsize=(5,3))
     plt.plot(np.arange(1,epochs+1), lossv)
     plt.title('validation loss')
-    plt.savefig("ReluLoss" + str(learning_rate) + ".png")
+    plt.savefig("3LayerAcc" + str(learning_rate) + ".png")
 
     plt.figure(figsize=(5,3))
     plt.plot(np.arange(1,epochs+1), accv)
     plt.title('validation accuracy')
-    plt.savefig("ReluAcc" + str(learning_rate) + ".png")
+    plt.savefig("3LayerLoss" + str(learning_rate) + ".png")
 
 
 def train(epoch, optimizer, log_interval=100):
