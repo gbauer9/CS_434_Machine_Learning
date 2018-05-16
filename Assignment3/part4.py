@@ -40,15 +40,19 @@ validation_loader = torch.utils.data.DataLoader(
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(32*32*3, 100)
+        self.fc1 = nn.Linear(32*32*3, 50)
         self.fc1_drop = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(100, 10)
+        self.fc2 = nn.Linear(50, 50)
+        self.fc2_drop = nn.Dropout(0.2)
+        self.fc3 = nn.Linear(50,10)
 
     def forward(self, x):
         x = x.view(-1, 32*32*3)
         x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
-        return F.log_softmax(self.fc2(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc2_drop(x)
+        return F.log_softmax(self.fc3(x))
 
 model = Net()
 
@@ -69,12 +73,12 @@ def main():
     plt.figure(figsize=(5,3))
     plt.plot(np.arange(1,epochs+1), lossv)
     plt.title('validation loss')
-    plt.savefig("ReluLoss" + str(learning_rate) + ".png")
+    plt.savefig("3LayerAcc" + str(learning_rate) + ".png")
 
     plt.figure(figsize=(5,3))
     plt.plot(np.arange(1,epochs+1), accv)
     plt.title('validation accuracy')
-    plt.savefig("ReluAcc" + str(learning_rate) + ".png")
+    plt.savefig("3LayerLoss" + str(learning_rate) + ".png")
 
 
 def train(epoch, optimizer, log_interval=100):
