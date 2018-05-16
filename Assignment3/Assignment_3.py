@@ -64,17 +64,17 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = x.view(-1, 32*32*3)
-        x = F.relu(self.fc1(x))
+        x = F.logsigmoid(self.fc1(x))
         x = self.fc1_drop(x)
      #   x = F.relu(self.fc2(x))
      #   x = self.fc2_drop(x)
-	return F.sigmoid(self.fc2(x))
+	return F.log_softmax(self.fc2(x))
 
 model = Net()
 if cuda:
     model.cuda()
 
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.5)
 
 print(model)
 def train(epoch, log_interval=100):
@@ -114,7 +114,7 @@ def validate(loss_vector, accuracy_vector):
         val_loss, correct, len(validation_loader.dataset), accuracy))
 
 #%%time
-epochs = 10
+epochs = 3
 
 lossv, accv = [], []
 for epoch in range(1, epochs + 1):
@@ -127,3 +127,7 @@ plt.title('validation loss')
 plt.figure(figsize=(5,3))
 plt.plot(np.arange(1,epochs+1), accv)
 plt.title('validation accuracy');
+
+plt.savefig("output.pdf");
+
+
