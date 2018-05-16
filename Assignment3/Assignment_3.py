@@ -19,6 +19,7 @@ print('Using PyTorch version:', torch.__version__, 'CUDA:', cuda)
 #torch.manual_seed(42)
 #if cuda:
 #    torch.cuda.manual_seed(42)
+
 batch_size = 32
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if cuda else {}
@@ -27,14 +28,14 @@ train_loader = torch.utils.data.DataLoader(
     datasets.CIFAR10('../batches', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.ToTensor(),
-			transforms.Normalize((0.4914, 0.422, 0.4465), (0.2470, 0.2435, 0.2616))
+			transforms.Normalize((0.5, 0.5, 0.5), (0.5,0.5,0.5))
                    ])),
     batch_size=batch_size, shuffle=True, **kwargs)
 
 validation_loader = torch.utils.data.DataLoader(
     datasets.CIFAR10('../batches', train=False, transform=transforms.Compose([
                        transforms.ToTensor(),
- 			transforms.Normalize((0.4914, 0.422, 0.4465), (0.2470, 0.2435, 0.2616))
+ 			transforms.Normalize((0.5,0.5,0.5), (0.5, 0.5, 0.5))
                    ])),
     batch_size=batch_size, shuffle=False, **kwargs)
 for (X_train, y_train) in train_loader:
@@ -48,25 +49,26 @@ plt.figure(figsize=(10*pltsize, pltsize))
 for i in range(10):
     plt.subplot(1,10,i+1)
     plt.axis('off')
-    plt.imshow(X_train[i,:,:,:].numpy().reshape(32, 32, 3), cmap="gray")
+    plt.imshow(X_train[i,:,:,:].numpy().reshape(32, 32, 3))
     plt.title('Class: '+str(y_train[i]))
 
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(32*32, 50)
+        self.fc1 = nn.Linear(32*32*3, 100)
         self.fc1_drop = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(50, 50)
-        self.fc2_drop = nn.Dropout(0.2)
-        self.fc3 = nn.Linear(50, 10)
+        self.fc2 = nn.Linear(100, 10)
+   
+  #   self.fc2_drop = nn.Dropout(0.2)
+    # 	self.fc3 = nn.Linear(50, 10)
 
     def forward(self, x):
-        x = x.view(-1, 32*32)
+        x = x.view(-1, 32*32*3)
         x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
-        x = F.relu(self.fc2(x))
-        x = self.fc2_drop(x)
-	return F.sigmoid(self.fc3(x))
+     #   x = F.relu(self.fc2(x))
+     #   x = self.fc2_drop(x)
+	return F.sigmoid(self.fc2(x))
 
 model = Net()
 if cuda:
@@ -112,7 +114,7 @@ def validate(loss_vector, accuracy_vector):
         val_loss, correct, len(validation_loader.dataset), accuracy))
 
 #%%time
-epochs = 100
+epochs = 10
 
 lossv, accv = [], []
 for epoch in range(1, epochs + 1):
