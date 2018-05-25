@@ -3,6 +3,8 @@ import csv
 import numpy as np
 import math
 import time
+import random
+
 from sklearn import preprocessing
 import operator
 from collections import Counter
@@ -11,7 +13,6 @@ import pylab as plt
 def norm_ary(file):                             #reads in file, converts to a matix, normalizes and returns the array
     with open(file) as file1 :
         reader = file1.readlines()
-        #diagnosis = []
         data = []
         for row in reader:                      #reads in each row
             temp1 = ""
@@ -19,24 +20,16 @@ def norm_ary(file):                             #reads in file, converts to a ma
                 temp1 += t
             temp2 = [int(e) if e.isdigit() else e for e in temp1.split(',')]
             stats = np.array(temp2)
-            #if len(stats) != 784:
-                #print(len(stats))
-            #diagnosis.append(stats[0])          #removes and stores diagnosis for normalization
-            #stats[0] = 0
             data.append(stats)
         patients = np.vstack(data)
-        #print(len(patients))
         norm_stats = preprocessing.normalize(patients)
-        #for i in range(len(norm_stats)):        #adds diagnosis back
-        #    norm_stats[i][0] = diagnosis[i]
     return norm_stats                           #returns array
 
 def dist(train_point, test_point):              #calculates distance between 2 data points, returns int
     sum = 0
-    for i in range(1,len(train_point)):
+    for i in range(len(train_point)):
         sum += pow(train_point[i] - test_point[i],2)
     return math.sqrt(sum)                       #returns int
-
 
 def accuracy(training, testing, k, i = None):           #calculates accuracy of method, returns float
     testing_accuracy = 0
@@ -53,21 +46,29 @@ def accuracy(training, testing, k, i = None):           #calculates accuracy of 
 
 def k_mean(training, clusters):
     for t in training:
-        if not (t==clusters[1][0]).all():
-            if not (t==clusters[0][0]).all():
-                if dist(t, clusters[0][0]) < dist(t, clusters[1][0]):
-                    clusters[0].append(t)
-                else:
-                    clusters[1].append(t)
+        i = 0
+        d = 0
+        min = 10000
+        for c in clusters:
+            if not (t==c[0]).all():
+                i += 1
+        if i >= len(clusters):
+            for r in range(len(clusters)):
+                d1 = dist(t, clusters[r][0])
+                if min > d1:
+                    min = d1
+                    d = r
+            clusters[d].append(t)
     return clusters
 
 def nearest(cluster, point):
-    min = 10000
+    min = dist(cluster[0], point)
+    temp = cluster[0]
     for c in cluster:
-        #print("d: ",d)
-        #print(min)
-        if dist(c, point) < min:
+        d1 = dist(c, point)
+        if d1 < min:
             temp = c
+            min = d1
     return temp
 
 def centroid(cluster):
@@ -82,51 +83,59 @@ def centroid(cluster):
     return temp
 
 def add_c(cluster, centers):
-    centers.append(cluster[1][0])
-    centers.append(cluster[0][0])
+    for c in cluster:
+        centers.append(c[0])
     return centers
 
 def check(cluster, centers):
-    for c in centers:
-        if (c==cluster[1][0]).all():
-            return False
-        if (c==cluster[0][0]).all():
-            return False
+    for c in cluster:
+        for c1 in centers:
+            if (c1==c[0]).all():
+                return False
     return True
 
 train = "data-1.txt"
 start_time = time.time()
 training = norm_ary(train)
-print("--- %s seconds ---" % (time.time() - start_time))
-print("upload complete")
-print(len(training))
 k = 2
-clusters = []
-temp1 = []
-temp1.append(training[12])
-clusters.append(temp1)
-i = 2
-for r in range(k-1):
-    temp = []
-    temp.append(training[int(len(training)/i)])
-    clusters.append(temp)
-    i += 1
-#print(len(clusters[0][0]))
-#print(len(clusters[1][0]))
-centers = list(clusters)
-temp2 = 0
-while abs(len(clusters[0]) - temp2) > .00001:
-    start_time1 = time.time()
-    clusters = list(k_mean(training, clusters))
-    #print("--- %s seconds ---" % (time.time() - start_time1))
-    print(len(clusters[0]), len(clusters[1]))
-
-    temp2 = len(clusters[0])
-    #start_time2 = time.time()
-    clusters = list([[centroid(clusters[0])],[centroid(clusters[1])]])
-    print("--- %s seconds ---" % (time.time() - start_time1))
-    if check(clusters, centers):
-        centers = add_c(clusters, centers)
-    else:
-        break
-    #print(len(clusters[0]), len(clusters[1]))
+x_axis = []
+y_axis = []
+while k <= 10:
+    print("starting k = ",k)
+    counter1 = 10
+    minimum = []
+    rando = list(random.sample(range(1,len(training)), k-1))
+    while counter1 > 0:
+        clusters = []
+        temp1 = []
+        temp1.append(training[0])
+        clusters.append(temp1)
+        i = 2
+        for r in rando:
+            temp = []
+            temp.append(training[r])
+            clusters.append(temp)
+            i += 1
+        centers = list(clusters)
+        temp2 = 0
+        counter = 0
+        while 1:
+            clusters = list(k_mean(training, clusters))
+            if abs(len(clusters[0]) - temp2) < .00001:
+                break
+            temp2 = len(clusters[0])
+            temp_clusters = []
+            for r in range(k):
+                temp0 = []
+                temp0.append(centroid(clusters[r]))
+                temp_clusters.append(temp0)
+            clusters = list(temp_clusters)
+            counter += 1
+        counter1 -=1
+        minimum.append(counter)
+    y_axis.append(min(minimum, key=float))
+    x_axis.append(k)
+    k += 1
+print("--- %s seconds ---" % (time.time() - start_time))
+plt.plot(x_axis, y_axis)  #plots training, testing, and LOOCV errors of various k values
+plt.show()
