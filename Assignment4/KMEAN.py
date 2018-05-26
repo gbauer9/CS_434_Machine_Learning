@@ -100,15 +100,16 @@ training = norm_ary(train)
 k = 2
 x_axis = []
 y_axis = []
-while k <= 10:
+while k <= 15:
     print("starting k = ",k)
     counter1 = 10
     minimum = []
-    rando = list(random.sample(range(1,len(training)), k-1))
     while counter1 > 0:
         clusters = []
         temp1 = []
         temp1.append(training[0])
+        rando = list(random.sample(range(1,len(training)), k-1))
+        print('random numbers: ', rando)
         clusters.append(temp1)
         i = 2
         for r in rando:
@@ -133,6 +134,7 @@ while k <= 10:
             counter += 1
         counter1 -=1
         minimum.append(counter)
+    print(minimum,"min: ", min(minimum))
     y_axis.append(min(minimum, key=float))
     x_axis.append(k)
     k += 1
