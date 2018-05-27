@@ -11,18 +11,18 @@ from sklearn import preprocessing
 import pylab as plt
 
 def norm_ary(file):                   #reads in file, converts to a matix, normalizes and returns the array
-    with open(file) as file1 :
-        reader = file1.readlines()
-        data = []
-        for row in reader:                      #reads in each row
-            temp1 = ""
-            for t in row:
-                temp1 += t
-            temp2 = [int(e) if e.isdigit() else e for e in temp1.split(',')]
-            stats = np.array(temp2)
-            data.append(stats)
-        patients = np.vstack(data)
-        norm_stats = preprocessing.normalize(patients)
+	with open(file) as file1 :
+		reader = file1.readlines()
+		data = []
+		for row in reader:                      #reads in each row
+			temp1 = ""
+			for t in row:
+				temp1 += t
+			temp2 = [int(e) if e.isdigit() else e for e in temp1.split(',')]
+			stats = np.array(temp2)
+			data.append(stats)	
+		patients = np.vstack(data)
+		norm_stats = preprocessing.normalize(patients)
 	return norm_stats
 
 #****************************************
@@ -37,7 +37,7 @@ def norm_ary(file):                   #reads in file, converts to a matix, norma
 
 
 #Compute the covariance matrix from the data
-#Use the covariance matrix to produce teh eigenvalues and eigenvectors
+#Use the covariance matrix to produce the eigenvalues and eigenvectors
 def cov(data):
 
 	m , n = data.shape
@@ -45,7 +45,7 @@ def cov(data):
 	#compute mean
 	data -= data.mean(axis=0)
 
-	cov_matrix = np.cov(data)
+	cov_matrix = np.cov(data, rowvar=False)
 	#eigh function returns 2 arrays:
 	#	the first is a 1-d array containing eigen values
 	#	the second is a 2-d array of the corresponding eigenvectors (in columns)
@@ -62,7 +62,6 @@ def cov(data):
 
 	print("10 top eigen-values: ")	
 	print(eval_top)
-	
 	plt.imshow(np.reshape(evecs,28,28))
 
 
