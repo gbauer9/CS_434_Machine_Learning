@@ -45,10 +45,10 @@ def cov(data):
 	plt.savefig("images/meanImage.png")
 
 	#compute mean-normalized matrix
-	data -= data.mean(axis=0)
+	data_mean_normal = data - data.mean(axis=0)
 
 	#compute covariance matrix of mean-normalized data
-	cov_matrix = np.cov(data, rowvar=False)
+	cov_matrix = np.cov(data_mean_normal, rowvar=False)
 
 	#eigh function returns 2 arrays:
 	#	the first is a 1-d array containing eigen values
@@ -73,6 +73,21 @@ def cov(data):
 	for i in range(10):
 		plt.imshow(np.reshape(evecs[i], (28, 28)))
 		plt.savefig("images/eigenVector" + str(i) + ".png")
+
+	#Apply the dimension reduction to each image and find the images with the highest values for each dimension
+	maxVals = np.full(10, -2147483648, dtype=float)
+	maxIndices = np.full(10, 0, dtype=int)
+	for i in range(6000):
+		z = np.matmul(evecs, data[i])
+		for j in range(10):
+			if z[j] > maxVals[j]:
+				maxVals[j] = z[j]
+				maxIndices[j] = i
+
+	#plot the images with highest values for each dimension
+	for i in range(10):
+		plt.imshow(np.reshape(data[maxIndices[i]], (28, 28)))
+		plt.savefig("images/maxImage" + str(i) + ".png")
 
 data = "data-1.txt"
 x = norm_ary(data)
