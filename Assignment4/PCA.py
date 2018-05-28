@@ -39,32 +39,40 @@ def norm_ary(file):                   #reads in file, converts to a matix, norma
 #Compute the covariance matrix from the data
 #Use the covariance matrix to produce the eigenvalues and eigenvectors
 def cov(data):
+	#find mean image and plot it
+	mean_image = data.mean(axis=0)
+	plt.imshow(np.reshape(mean_image, (28, 28)))
+	plt.savefig("images/meanImage.png")
 
-	m , n = data.shape
-
-	#compute mean
+	#compute mean-normalized matrix
 	data -= data.mean(axis=0)
 
+	#compute covariance matrix of mean-normalized data
 	cov_matrix = np.cov(data, rowvar=False)
+
 	#eigh function returns 2 arrays:
 	#	the first is a 1-d array containing eigen values
 	#	the second is a 2-d array of the corresponding eigenvectors (in columns)
 	evals, evecs = eigh(cov_matrix)
-	#sort the eigenvalues in decreasing order.
+
+	#find indices of evals array that would sort it in decreasing order.
 	sort = np.argsort(evals)[::-1]
-	#sort the eigenvectors in the exact same way
+
+	#sort both the evals and evecs arrays by those indices
 	evecs = evecs[:, sort]
 	evals = evals[sort]
 
-	#select the first 10, as per assignment instructions
-	evecs = evecs[:, :10]
+	#select the first 10, as per assignment instructions. Take the transpose of evecs to make it easier to iterate through
+	evecs = evecs[:, :10].T
 	eval_top = evals[:10]
 
-	print("10 top eigen-values: ")	
-	print(eval_top)
-	plt.imshow(np.reshape(evecs,28,28))
+	#print top 10 eigen-values
+	print("10 top eigen-values: " + str(eval_top))
 
-
+	#plot the top 10 eigenvectors
+	for i in range(10):
+		plt.imshow(np.reshape(evecs[i], (28, 28)))
+		plt.savefig("images/eigenVector" + str(i) + ".png")
 
 data = "data-1.txt"
 x = norm_ary(data)
