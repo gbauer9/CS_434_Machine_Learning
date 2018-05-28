@@ -78,8 +78,10 @@ def cov(data):
 	maxVals = np.full(10, -2147483648, dtype=float)
 	maxIndices = np.full(10, 0, dtype=int)
 	for i in range(6000):
+		#apply the dimension reduction to each datapoint
 		z = np.matmul(evecs, data[i])
 		for j in range(10):
+			#store max value of each dimension and the index of the image 
 			if z[j] > maxVals[j]:
 				maxVals[j] = z[j]
 				maxIndices[j] = i
