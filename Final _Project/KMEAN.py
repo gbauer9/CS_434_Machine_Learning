@@ -9,18 +9,47 @@ from sklearn import preprocessing
 import operator
 from collections import Counter
 import pylab as plt
+from datetime import*
+from decimal import *
+
+def make_wind(window):      #average
+    temp = []
+    for r in range(len(window[0])-1):
+        sum = 0
+        for w in window:
+            sum += w[r]
+        temp.append(sum/len(window))
+    temp.append(window[-1][-1])
+    stats = np.array(temp)
+    return stats
 
 def norm_ary(file):                             #reads in file, converts to a matix, normalizes and returns the array
+    getcontext().prec = 28
     with open(file) as file1 :
         reader = file1.readlines()
         data = []
+        window = []
         for row in reader:                      #reads in each row
-            temp1 = ""
-            for t in row:
-                temp1 += t
-            temp2 = [int(e) if e.isdigit() else e for e in temp1.split(',')]
-            stats = np.array(temp2)
-            data.append(stats)
+            temp1 = [e for e in row.split(',')]
+            temp_date = list([Decimal(datetime.strptime(temp1[0], "%Y-%m-%dT%H:%M:%SZ").hour)])
+            temp2 = temp_date + [Decimal(t) for t in temp1[1:]]
+            if len(window) < 7:
+                window.append(temp2)
+                #print(window[-1])
+                #print(window[-1][-1])
+                if window[-1][-1] >= 1:
+                    stats = make_wind(window)
+                    data.append(stats)
+                    window = []
+            else:
+                stats = make_wind(window)
+                data.append(stats)
+                window = []
+                #stats = np.array(temp2)
+        if len(window) < 7:                     #appends any unfinished data points
+            if temp2[-1] <= 0:
+                stats = make_wind(window)
+                data.append(stats)
         patients = np.vstack(data)
         norm_stats = preprocessing.normalize(patients)
     return norm_stats                           #returns array
@@ -85,15 +114,32 @@ def check(cluster, centers):
                 return False
     return True
 
-train = "data-1.txt"
-start_time = time.time()
+def ending(clusters, last):
+    if len(last) < 1:
+        #print("length less than 1")
+        return False
+    i = 0
+    for c in clusters:
+        if abs(len(c) - last[i]) < .00001:
+            #print("length the same for cluster ", i)
+            #print("cluster length: ", len(c), "previous length: ", last[i])
+            i += 1
+        else:
+            #print("length not the same for cluster ", i)
+            #print("cluster length: ", len(c), "previous length: ", last[i])
+            return False
+    return True
+
+train = "Subject_4.csv"
+start_time = datetime.now()
 training = norm_ary(train)
+
 k = 2                       #sets initial k value
 x_axis = []                 # for plotting k-values
 y_axis = []                 # for plotting minimum SSE values
 while k <= 10:              #sets final k value
     print("starting k = ",k)
-    counter1 = 15           #sets how many times each k value runs
+    counter1 = 50           #sets how many times each k value runs
     minimum = []
     y1_axis = []            # for plotting SSE values as it converges
     while counter1 > 0:     #runs until counter drops to 0
@@ -109,13 +155,19 @@ while k <= 10:              #sets final k value
             clusters.append(temp)
             i += 1
         centers = list(clusters)
-        temp2 = 0
+        temp2 = []
         counter = 0
         while 1:                                            #runs until break statement
             clusters = list(k_mean(training, clusters))
-            if abs(len(clusters[0]) - temp2) < .00001:      #break statement: when clusters stop changing size
+            #print("cluster sizes:")
+            #for c in clusters:
+                #print(len(c))
+            #print("---------------------------")
+            if ending(clusters, temp2):      #break statement: when clusters stop changing size
                 break
-            temp2 = len(clusters[0])
+            temp2 = []
+            for c in clusters:
+                temp2.append(len(c))
             temp_clusters = []
             temp01 = []
             for r in range(k):
@@ -136,6 +188,6 @@ while k <= 10:              #sets final k value
     y_axis.append(min(minimum, key=float))
     x_axis.append(k)
     k += 1
-print("--- %s seconds ---" % (time.time() - start_time))
 plt.plot(x_axis, y_axis)                                #plots SSE values as a function of k-values
 plt.show()
+print("--- %s seconds ---" % (datetime.now() - start_time))
