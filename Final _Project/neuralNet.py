@@ -14,7 +14,7 @@ def load_og_data(filenames):
         #Get .csv into matrix of strings
         temp = np.loadtxt(filename, dtype=str, delimiter=',')
 
-    
+
         #Extract the hour from matrix and store in its own array
         hours = [[datetime.strptime(row[0], "%Y-%m-%dT%H:%M:%SZ").hour] for row in temp]
         #Delete hours from main matrix and convert rest of values to floats
@@ -23,7 +23,7 @@ def load_og_data(filenames):
         #Add hours back to the front of the matrix
         temp2 = np.hstack((hours, temp))
 
-        
+
         #Create chunks of either 30 minutes or however long until an episode, then average all those values into one feature vector via make_instance()
         chunk = []
 
@@ -47,7 +47,7 @@ def load_flattened_data(filenames):
 
     for filename in filenames:
         temp = np.loadtxt(filename, dtype=float, delimiter=',')
-        
+
         for row in temp:
             chunk = np.array(row)
             chunk = np.reshape(chunk, (7, 9), order='F')
@@ -59,7 +59,7 @@ def load_flattened_data(filenames):
 def make_instance(chunk):
     chunk = np.array(chunk)
 
-    return chunk.mean(0)    
+    return chunk.mean(0)
 
 def classify_and_write(train, trainClasses, test, outfileName):
 
@@ -76,7 +76,7 @@ def classify_and_write(train, trainClasses, test, outfileName):
             print('yo')
 
     of.close()
-    
+
     return
 
 
@@ -87,7 +87,7 @@ def main():
     testFiles = ["TestData/general_test_instances.csv"]
     trainData = np.array(load_og_data(trainingFiles))
     testData = np.array(load_flattened_data(testFiles))
-    
+
     classes = trainData[:, -1]
     trainData = np.delete(trainData, -1, 1)
 

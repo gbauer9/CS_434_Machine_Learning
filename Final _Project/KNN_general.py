@@ -57,40 +57,33 @@ def norm_ary(file):                             #reads in file, converts to a ma
     return norm_stats                           #returns array
 
 def norm_test(file):                             #reads in file, converts to a matix, normalizes and returns the array
-    getcontext().prec = 28
+    getcontext().prec = 3
     window_timeframe = 7
     with open(file) as file1 :
         reader = file1.readlines()
         data = []
-        window = []
         i = 0
         sum = 0
-        #index = len(reader)
-        #print("index: ",index)
         for row in reader:
-            temp1 = [float(e) for e in row.split(',')]
-            for t in temp1:
+            window = []
+            temp00 = [e for e in row.split(',')]
+            for r in temp00:
                 if i == 6:
-                    #print(t)
-                    sum += t
+                    if r.isdigit():
+                        r = Decimal(r)
+                    sum += Decimal(r)
                     window.append(sum/7)
                     sum = 0
                     i = 0
                 else:
-                    #print(t)
-                    sum += t
+                    if r.isdigit():
+                        r = Decimal(r)
+                    sum += Decimal(r)
                     i += 1
+            window = np.array(window)
             data.append(window)
-            #print("wont stop")
-            #print(index)
-            #if index >= 1:
-                #index -= 1
-        print("almost done in norm_test")
-        print(data[-1])
         patients = np.vstack(data)
-        print("nearly done in norm_test")
         norm_stats = preprocessing.normalize(patients)
-        print("done in norm_test")
     return norm_stats                           #returns array
 
 def dist(train_point, test_point):              #calculates distance between 2 data points, returns int
@@ -183,19 +176,20 @@ def training_check(train):
 
 train = ["Subject_1.csv", "Subject_4.csv", "Subject_6.csv", "Subject_9.csv"]
 #training_check(train)
-test = "general_test_instances.csv"
-testing = norm_test(test)
 k = 3                   #k=3 had the best predictive results
 final_train = ["Subject_1.csv", "Subject_4.csv", "Subject_6.csv"]       # leaveing our Subject_9 has the best impact on predictions
 results = []
-print("done with test setup")
+temp0 = []
 for f in final_train:
     temp0.append(norm_ary(f))
 final_training = np.vstack(temp0)
 print("done with training setup")
-index = len(testing)
+test = "general_test_instances.csv"
+testing = norm_test(test)
+
+print("done with testing setup")
 for t in testing:
-    print(index)
-    results.append(nearest_k(final_training, t, k))
-    index -=1
-print(results)
+    results.append(int(nearest_k(final_training, t, k)))
+with open('general_pred1.csv', 'w', newline='') as file1:
+    write = csv.writer(file1)
+    write.writerows(results)
